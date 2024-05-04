@@ -47,8 +47,6 @@ class Game:
         self.font_size = 72
         self.font = pygame.font.Font(None, self.font_size)
 
-        # Колір фону
-        self.background_color = pygame.Color('black')
 
         # Список бонусів та ймовірність їх випадіння
         self.bonus_list = []
@@ -223,7 +221,8 @@ class Game:
                     if event.key == pygame.K_r:  # Если нажата клавиша 'R'
                         self.restart_game()
 
-            self.sc.fill(self.background_color)
+            background_image = pygame.image.load('images/backbround.jpg')
+            self.sc.blit(background_image, (0, 0))
 
             self.draw_blocks()
             self.draw_paddle()
