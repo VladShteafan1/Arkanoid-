@@ -5,9 +5,14 @@ from bonus import Bonus
 
 class Game:
     def __init__(self):
+        """
+            Ініціалізує параметри гри.
+        """
+        # Параметри вікна гри
         self.WIDTH, self.HEIGHT = 1200, 800
         self.fps = 60
 
+        # Параметри платформи
         self.max_paddle_width = 660
         self.min_paddle_width = 165
 
@@ -17,6 +22,7 @@ class Game:
         self.paddle = pygame.Rect(self.WIDTH // 2 - self.paddle_w // 2, self.HEIGHT - self.paddle_h - 10, self.paddle_w,
                                   self.paddle_h)
 
+        # Параметри м'ячика
         self.max_ball_speed = 10
         self.min_ball_speed = 4
 
@@ -27,6 +33,7 @@ class Game:
                                 self.ball_rect)
         self.dx, self.dy = 1, -1
 
+        # Список блоків
         self.block_list = [pygame.Rect(10 + 120 * i, 10 + 70 * j, 100, 50) for i in range(10) for j in range(4)]
         self.color_list = [(rnd(30, 256), rnd(30, 256), rnd(30, 256)) for i in range(10) for j in range(4)]
 
@@ -36,33 +43,52 @@ class Game:
 
         self.font = pygame.font.Font(None, 36)
 
+        # Шрифт для відображення тексту
         self.font_size = 72
         self.font = pygame.font.Font(None, self.font_size)
 
+        # Колір фону
         self.background_color = pygame.Color('black')
 
+        # Список бонусів та ймовірність їх випадіння
         self.bonus_list = []
         self.bonus_drop_chance = 1
 
+        # Параметри бонусу "paddle_extension"
         self.paddle_extension_duration = 5000
         self.paddle_extended = False
         self.paddle_extension_end_time = 0
 
     def draw_blocks(self):
+        """
+            Відображає блоки на екрані гри.
+        """
         for color, block in enumerate(self.block_list):
             pygame.draw.rect(self.sc, self.color_list[color], block)
 
     def draw_paddle(self):
+        """
+            Відображає платформу на екрані гри.
+        """
         pygame.draw.rect(self.sc, pygame.Color('darkorange'), self.paddle)
 
     def draw_ball(self):
+        """
+            Відображає м'ячик на екрані гри.
+        """
         pygame.draw.circle(self.sc, pygame.Color('white'), self.ball.center, self.ball_radius)
 
     def draw_bonuses(self):
+        """
+            Відображає бонуси на екрані гри.
+        """
         for bonus in self.bonus_list:
             pygame.draw.rect(self.sc, pygame.Color('green'), bonus.rect)
 
     def update_paddle(self):
+        """
+            Оновлює рух платформи залежно від натискання клавіш гравцем.
+        """
         key = pygame.key.get_pressed()
         if key[pygame.K_LEFT] and self.paddle.left > 0:
             self.paddle.left -= self.paddle_speed
@@ -70,6 +96,9 @@ class Game:
             self.paddle.right += self.paddle_speed
 
     def update_ball(self):
+        """
+            Оновлює рух м'ячика та обробляє його взаємодію з об'єктами на полі гри.
+        """
         self.ball.x += self.ball_speed * self.dx
         self.ball.y += self.ball_speed * self.dy
 
@@ -95,10 +124,16 @@ class Game:
         self.update_bonuses()
 
     def drop_bonus(self, x, y):
-            if rnd(0, 100) / 100 < self.bonus_drop_chance:
-                self.bonus_list.append(Bonus(x, y))
+        """
+            Випадково генерує бонус та додає його до списку бонусів на полі гри.
+        """
+        if rnd(0, 100) / 100 < self.bonus_drop_chance:
+            self.bonus_list.append(Bonus(x, y))
 
     def update_bonuses(self):
+        """
+            Оновлює рух бонусів та активує їх, якщо вони натикаються на платформу.
+        """
         for bonus in self.bonus_list:
             bonus.move()
             if bonus.rect.colliderect(self.paddle):
@@ -108,6 +143,9 @@ class Game:
                 self.bonus_list.remove(bonus)
 
     def activate_bonus(self, bonus):
+        """
+            Активує ефект бонусу.
+        """
         if bonus.type == "speed_up":
             if self.ball_speed + 2 <= self.max_ball_speed:
                 self.ball_speed += 2
@@ -125,6 +163,9 @@ class Game:
                 self.paddle.width //= 2
 
     def detect_collision(self, dx, dy, ball, rect):
+        """
+            Визначає колізію між м'ячиком та об'єктом на полі гри.
+        """
         if dx > 0:
             delta_x = ball.right - rect.left
         else:
@@ -143,12 +184,18 @@ class Game:
         return dx, dy
 
     def check_win_condition(self):
+        """
+            Перевіряє умову перемоги в грі.
+        """
         if not self.block_list:
             return True
         else:
             return False
 
     def game_over(self):
+        """
+            Відображає повідомлення про завершення гри та можливість перезапуску.
+        """
         self.sc.fill((0, 0, 0))
         game_over_text = self.font.render("YOU DIED", True, pygame.Color('red'))
         restart_text = self.font.render("Press 'R' to restart", True, pygame.Color('white'))
@@ -159,9 +206,15 @@ class Game:
         pygame.display.flip()
 
     def restart_game(self):
+        """
+           Перезапускає гру.
+        """
         self.__init__()
 
     def run(self):
+        """
+            Головний цикл гри, обробляє події, оновлює та відображає стан гри.
+        """
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
